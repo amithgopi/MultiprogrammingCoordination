@@ -40,10 +40,10 @@ int main() {
      // Initizlize the mutex
      pthread_mutex_init(&mutex, NULL);
 
-     cout<<"Hello World";
+     //Store producer and consumer threads
      pthread_t producers[NUM_PRODUCER_THREADS];
      pthread_t consumers[NUM_CONSUMER_THREADS];
-
+     //Create and initialize an array to store an identifier for each thread
      int thread_id[max(NUM_CONSUMER_THREADS, NUM_PRODUCER_THREADS)];
      for(int i = 0; i < max(NUM_CONSUMER_THREADS, NUM_PRODUCER_THREADS); i++) {
           thread_id[i] = i+1;
