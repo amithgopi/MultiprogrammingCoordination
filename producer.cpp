@@ -4,7 +4,6 @@
 #include<time.h>
 #include<unistd.h>
 
-
 using namespace std;
 
 // Define constants
@@ -22,9 +21,15 @@ sem_t queue_full_semaphore;
 sem_t queue_empty_semaphore;
 pthread_mutex_t mutex;
 
+// Declare the producer and consumer functions
 void* producer(void*);
 void* consumer(void*);
 
+/**
+ * @brief Main method.
+ * 
+ * @return int 
+ */
 int main() {
      // Seed rand
      srand (time(NULL));
@@ -78,11 +83,23 @@ int main() {
      return 0;
 }
 
+/**
+ * @brief Struct to act as a wrapper fro messages to be placed in the message queue/buffer.
+ * This contains a message id and a pointer to the message.
+ * 
+ */
 struct Message { 
      int message_id;
      void* message_ptr;
 };
 
+/**
+ * @brief Implements the producer part of the problem. It is an infinite loop function where in each loop iteration, it tries to send a message to
+ * the message queue if it is able to acquire the necessary mutex locks and semaphores
+ * 
+ * @param pid value used to identify the process pass from the thread creation process
+ * @return void* 
+ */
 void* producer(void* pid) {
      while(true) {
           // Decrease the empty semaphore lock by one to indicate decremnting the number of empty slots
@@ -107,6 +124,13 @@ void* producer(void* pid) {
      }
 }
 
+/**
+ * @brief Implements the consumer part of the problem. It is an infinite loop function where in each loop iteration, it tries to recieve a message from
+ * the message queue if it is able to acquire the necessary mutex locks and semaphores
+ * 
+ * @param pid value used to identify the process pass from the thread creation process
+ * @return void* 
+ */
 void* consumer(void* cid) {
           while(true) {
           // Decrease the full semaphore lock by one to indicate decrementing the number of empty slots
