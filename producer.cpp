@@ -33,7 +33,7 @@ void* consumer(void*);
 int main() {
      // Seed rand
      srand (time(NULL));
-
+     
      // Allocate buffer
      buffer =  new void*[BUFFER_SIZE];
      // Initialize semaphores
@@ -132,7 +132,7 @@ void* producer(void* pid) {
  * @return void* 
  */
 void* consumer(void* cid) {
-          while(true) {
+     while(true) {
           // Decrease the full semaphore lock by one to indicate decrementing the number of empty slots
           // This reserves the current message for this consumer
           sem_wait(&queue_full_semaphore);

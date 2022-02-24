@@ -11,7 +11,8 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-lstdc++",
-                "-pthread"
+                "-pthread",
+                "-lrt"
             ],
             "options": {
                 "cwd": "${fileDirname}"
@@ -33,7 +34,8 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-lstdc++",
-                "-pthread"
+                "-pthread",
+                "-lrt"
             ],
             "options": {
                 "cwd": "${fileDirname}"
