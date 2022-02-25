@@ -1,6 +1,16 @@
 #ifndef _THREAD_H
 #define _THREAD_H
 
+/**
+ * @file thread_based.c
+ * @author Amith Gopi (431000927)
+ * @brief This demonstrates the multiple producer consumer problem using pthread - single process creating multiple threads for producers and consumers.
+ * Inter thread communication is handles by a common cycle message queue - implemnted by a bounded array - access to which is controlled usin two 
+ * semaphoes and a mutex for the critical sections
+ * @version 1.0
+ * @date 2022-02-25
+ * 
+ */
 #include <semaphore.h>
 #include <pthread.h>
 #include <time.h>

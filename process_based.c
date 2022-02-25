@@ -1,6 +1,17 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H
 
+/**
+ * @file process_based.c
+ * @author Amith Gopi (431000927)
+ * @brief Implements a soltion to the multiple producer, consumer problem using posix message queus for inter process communication.
+ * The access to this queue is handled by two semaphoes and another semaphore/mutex locks the critical section of the code to preserve
+ * its atomicity. This prints the output of the result in to two files - input.txt (messages sent to the queue) and output.txt (messages
+ * red from the queue).
+ * @version 1.0
+ * @date 2022-02-25
+ * 
+ */
 #include<semaphore.h>
 #include<time.h>
 #include<mqueue.h>
