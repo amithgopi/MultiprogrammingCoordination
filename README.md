@@ -11,7 +11,7 @@ instead of individual processes for each producer and consumer.
 ## Build
 To run the program compile the files main.c, process_based.c and thread_based.c
 
-##Run
+## Run
 To run the program execute the binary named `main`
 The following arguments must be passed to the input:
  * -p for number of producers, -c for number of consumers and -d for the consumer delay in milliseconds
