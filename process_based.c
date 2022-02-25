@@ -9,10 +9,13 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <sys/types.h>
+  #include <sys/wait.h>
+  #include <unistd.h>
 
-// Set to enable debug logs
+// Set to enable debug loggers
 #define DEBUG_LOGS false
-// Define logs levels
+// Define loggers levels
 enum LOG_LEVEL {DEBUG, INFO};
 // define name of message queue
 #define MESSAGE_QUEUE "/msg_queue"
@@ -26,7 +29,7 @@ enum LOG_LEVEL {DEBUG, INFO};
 #define CRITICAL_SECTION_MUTEX "/cs_mutex"
 
 // NUmber of iterations to run the producer process for, set to -1 for infinite iterations
-#define ITERATIONS 100
+int ITERATIONS = 100;
 
 // Macro to convert millisseconds to nanoseconds
 #define msTons(delay) delay*1000000L
@@ -44,7 +47,7 @@ void* consumer(int);
 void initlializeSemaphores();
 void createMessageQueue();
 void cleanSemaphores();
-void log(enum LOG_LEVEL, char *s, ...);
+void logger(enum LOG_LEVEL, char *s, ...);
 
 // Initlialize a timespec arry to be used as delay
 struct timespec delay = {.tv_sec = 0, .tv_nsec = msTons(500)};
@@ -54,13 +57,14 @@ struct timespec delay = {.tv_sec = 0, .tv_nsec = msTons(500)};
  * 
  * @return int 
  */
-int runProcessBased(size_t _num_producers, size_t _num_consumers, int _delay ) {
+int runProcessBased(size_t _num_producers, size_t _num_consumers, int _delay, int _iterations ) {
      // Seed rand
      srand(time(NULL));
      //Init variables
      NUM_PRODUCERS = _num_producers;      //Number of producers
      NUM_CONSUMERS = _num_consumers;     //Number of consumers
      DELAY = _delay; 
+     ITERATIONS = _iterations;
      // Clean any remant shared resoures from previous runs
      cleanSemaphores();
      // Init a new set of semaphores
@@ -144,13 +148,13 @@ void* producer(int producer_id) {
      while(count) {
           // Decrease the empty semaphore lock by one to indicate decremnting the number of empty slots
           // This reserves the slot for the producer
-          log(DEBUG, "PORD %d, wait\n", producer_id);
+          logger(DEBUG, "PORD %d, wait\n", producer_id);
           sem_wait(queue_empty_semaphore);
-          log(DEBUG, "PORD %d, mutex wait\n", producer_id);
+          logger(DEBUG, "PORD %d, mutex wait\n", producer_id);
           // Lock mutex for critical section of code
           sem_wait(mutex);
           filePointer = fopen(INPUT_FILE, "a");
-          log(DEBUG, "PORD %d, CS\n", producer_id);
+          logger(DEBUG, "PORD %d, CS\n", producer_id);
 
           // Create a message with a random number
           char input[MAX_MESSAGE_SIZE] ;
@@ -168,7 +172,7 @@ void* producer(int producer_id) {
           fclose(filePointer);
           // Unlock mutex for critical section of code
           sem_post(mutex);
-          log(DEBUG, "PORD %d, unlock\n", producer_id);
+          logger(DEBUG, "PORD %d, unlock\n", producer_id);
           // Increase the full semaphore lock by one to indicate incrementing the number of full slots
           // This indicates that a message is in the queue
           sem_post(queue_full_semaphore);
@@ -208,25 +212,25 @@ void* consumer(int consumer_id) {
      while(count) {
           // Decrease the full semaphore lock by one to indicate decrementing the number of empty slots
           // This reserves the current message for this consumer
-          log(DEBUG, "CON %d, wait\n", consumer_id);
+          logger(DEBUG, "CON %d, wait\n", consumer_id);
           sem_wait(queue_full_semaphore);
-          log(DEBUG, "CON %d, mnutex wait\n", consumer_id);
+          logger(DEBUG, "CON %d, mnutex wait\n", consumer_id);
           // Lock mutex for critical section of code
           sem_wait(mutex);
-          log(DEBUG, "CON %d, CS\n", consumer_id);
+          logger(DEBUG, "CON %d, CS\n", consumer_id);
           // Open file in append mode to add the received message
           filePointer = fopen(OUTPUT_FILE, "a");
           // Receive message
           char output[MAX_MESSAGE_SIZE+1];
           mq_receive(mqd, output, 100, NULL);
-          log(INFO, "CON - %d | MSG - %s\n", consumer_id, output);
+          logger(INFO, "CON - %d | MSG - %s\n", consumer_id, output);
           // Place message in file
           fprintf(filePointer, "CON - %d | %s\n", consumer_id, output);
           fclose(filePointer);
 
           // Unlock mutex for critical section of code  
           sem_post(mutex);
-          log(DEBUG, "CON %d unlock\n", consumer_id);
+          logger(DEBUG, "CON %d unlock\n", consumer_id);
           // Set process to sleep for a random interval based on the DELAY parameter
           if( DELAY ) {
                delay.tv_nsec = msTons(rand()%500);
@@ -288,13 +292,13 @@ void cleanSemaphores() {
 }
 
 /**
- * @brief Better logs based on levels
+ * @brief Better loggers based on levels
  * 
  * @param level 
  * @param s 
  * @param ... 
  */
-void log(enum LOG_LEVEL level, char *s, ...) {
+void logger(enum LOG_LEVEL level, char *s, ...) {
      va_list args;
      va_start(args, s);
      if (level == DEBUG && DEBUG_LOGS) {

@@ -4,6 +4,9 @@
         "fcntl.h": "c",
         "random": "c",
         "limits": "cpp",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "stdbool.h": "c",
+        "*.tcc": "c",
+        "cmath": "c"
     }
 }

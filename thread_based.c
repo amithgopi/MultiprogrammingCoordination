@@ -1,12 +1,12 @@
 #ifndef _THREAD_H
 #define _THREAD_H
 
-#include<semaphore.h>
-#include<pthread.h>
-#include<time.h>
-#include<unistd.h>
-#include<stdlib.h>
-#include<stdbool.h>
+#include <semaphore.h>
+#include <pthread.h>
+#include <time.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 #define max(a, b) ((a<b) ? b : a)
 
@@ -15,6 +15,7 @@ const size_t BUFFER_SIZE_T = 10;               //Buffer size
 size_t NUM_PRODUCERS_T = 5; //Number of producers
 size_t NUM_CONSUMERS_T = 5; //Number of consumers
 int DELAY_T = 500; 
+int ITERATIONS_T = 100;
 
 struct timespec delay_t = {.tv_sec = 0, .tv_nsec = 500*1000000L};
 
@@ -37,7 +38,7 @@ void* consumer_t(void*);
  * 
  * @return int 
  */
-int runThreadBasedExec(size_t _num_producers, size_t _num_consumers, int _delay ) {
+int runThreadBasedExec(size_t _num_producers, size_t _num_consumers, int _delay, int _iterations ) {
      // Seed rand
      srand (time(NULL));
 
@@ -45,6 +46,7 @@ int runThreadBasedExec(size_t _num_producers, size_t _num_consumers, int _delay 
      NUM_PRODUCERS_T = _num_producers;      //Number of producers
      NUM_CONSUMERS_T = _num_consumers;     //Number of consumers
      DELAY_T = _delay;
+     ITERATIONS_T = _iterations;
 
      // Allocate buffer
      buffer = malloc(BUFFER_SIZE_T);
@@ -114,7 +116,8 @@ struct Message {
  * @return void* 
  */
 void* producer_t(void* pid) {
-     while(true) {
+     int count = ITERATIONS_T;
+     while(count) {
           // Decrease the empty semaphore lock by one to indicate decremnting the number of empty slots
           // This reserves the slot for the producer
           sem_wait(&queue_empty_semaphore);
@@ -126,13 +129,14 @@ void* producer_t(void* pid) {
           buffer[current_buffer_write_index] = (void *)&message;
           // Increase buffer size pointer
           current_buffer_write_index = (current_buffer_write_index + 1)%BUFFER_SIZE_T;
-          printf("Producer ID: %d - Placing message - %d | Queue: %d\n", *(int *)pid, message.message_id, current_buffer_write_index);
+          printf("Producer ID: %d - Placing message - %d | Queue: %d\n", *(int *)pid, message.message_id, (int)current_buffer_write_index);
           // Unlock mutex for critical section of code
           pthread_mutex_unlock(&mutex);
 
           // Increase the full semaphore lock by one to indicate incrementing the number of full slots
           // This indicates that a message is in the queue
           sem_post(&queue_full_semaphore);
+          count--;
           
      }
 }
@@ -156,7 +160,7 @@ void* consumer_t(void* cid) {
           struct Message message =  *(struct Message*)buffer[current_buffer_read_index];
           // Increase buffer size pointer
           current_buffer_read_index = (current_buffer_read_index + 1)%BUFFER_SIZE_T;
-          printf("Consumer ID: %d - Recieved message - %d | Queue: %d\n", *(int *)cid, message.message_id, current_buffer_read_index);
+          printf("Consumer ID: %d - Recieved message - %d | Queue: %d\n", *(int *)cid, message.message_id, (int)current_buffer_read_index);
           // Unlock mutex for critical section of code
           pthread_mutex_unlock(&mutex);
           // Create a delay to simmulate processing time
