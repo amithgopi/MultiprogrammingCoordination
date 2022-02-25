@@ -11,6 +11,9 @@ instead of individual processes for each producer and consumer.
 
 ## Build
 To run the program compile the files main.c, process_based.c and thread_based.c
+Run `gcc -g main.c -o main -pthread -lrt`
+This should generate a executable file called main.
+*NOTE*: Ensure that main has the executable permission (+x) set to that it can run.
 
 ## Run
 To run the program execute the binary named `main`
