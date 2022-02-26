@@ -1,7 +1,7 @@
 # MultiprogrammingCoordination
 Implement a correct solution to the n-dimensional multiple producer consumer problem. The program uses a POSIX message queue to implement inter process
 communication between multiple producers and consumers. The producers place their messsages (generated using rand as random numbers) in to the queue and
-the consumer recive them from the queue. Both write their respective messages to files called input.txt and output.txt in the same folder as the `main.exe` binary.
+the consumer recive them from the queue. Both write their respective messages to files called input.txt and output.txt in the same folder as the `main` binary.
 This uses two semaphoes to handle the bound message buffer so that producers wait on a full buffer and consumers wait on an empty buffer.
 Another semaphore (or mutex) is used to lock the critical section of the code preserving the atomicity if this section.
 The process is set to run for **100** iterations of a producer by default - each producer produces 100 messages. The -t argument can be used to change this
@@ -12,14 +12,14 @@ instead of individual processes for each producer and consumer.
 ## Build
 To run the program compile the files main.c, process_based.c and thread_based.c.
 
-Run `gcc -g main.c -o main.exe -pthread -lrt`
+Run `gcc -g main.c -o main -pthread -lrt`
 
 This should generate a executable file called main.
 
 *NOTE*: Ensure that main has the executable permission (+x) set to that it can run.
 
 ## Run
-To run the program execute the binary named `main.exe`
+To run the program execute the binary named `main`
 The following arguments must be passed to the input:
  * -p for number of producers, -c for number of consumers and -d for the consumer delay in milliseconds
  * The -a option enables an alternate mode which uses pthreads to create threads instead of processes using pthreads.h.
